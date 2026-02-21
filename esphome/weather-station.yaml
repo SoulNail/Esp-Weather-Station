@@ -1,0 +1,76 @@
+esphome:
+  name: weather-station
+  friendly_name: weather-station
+
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: arduino
+  flash_size: 16MB
+
+# 日志级别 INFO (省资源)
+logger:
+  level: NONE
+
+api:
+  encryption:
+    key: "替换为你的key"
+
+ota:
+  - platform: esphome
+    password: "替换为你的passwd"
+
+wifi:
+  ssid: "ChinaNet-49zq"
+  password: "替换为你的wifi密码"
+
+  # 【省电】WiFi 轻度睡眠模式
+  power_save_mode: LIGHT
+
+  manual_ip:
+    static_ip: 192.168.110.10
+    gateway: 192.168.110.2
+    subnet: 255.255.255.0
+
+  ap:
+    ssid: "Weather-Fallback"
+    password: "JBOnKEnwOb5U"
+
+captive_portal:
+
+# --- 硬件配置 ---
+
+i2c:
+  sda: 8
+  scl: 9
+  scan: true
+  id: bus_a
+
+sensor:
+  - platform: bme280_i2c
+    i2c_id: bus_a
+    address: 0x77  # 你的正确地址
+    # 【省电】60秒更新一次
+    update_interval: 300s
+    temperature:
+      name: "temp"
+    humidity:
+      name: "humidity"
+    pressure:
+      name: "pressure"
+
+light:
+  - platform: neopixelbus
+    type: GRB
+    variant: WS2812
+    pin: 48
+    num_leds: 1
+    name: "Light"
+    id: status_led
+    
+    # 【护眼】限制最大亮度 20%
+    color_correct: [20%, 20%, 20%]
+    
+    # 【简单】重启后默认关闭
+    restore_mode: ALWAYS_OFF
+    
